@@ -11,6 +11,7 @@ import javax.validation.ConstraintViolationException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fitmap.function.common.config.ObjectMapperConfig;
+import com.fitmap.function.common.exception.TerminalException;
 import com.fitmap.function.common.payload.response.ErrorResponse;
 import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
@@ -30,6 +31,18 @@ public class ResponseService {
 
     private static final ObjectMapper OBJECT_MAPPER = ObjectMapperConfig.OBJECT_MAPPER;
 
+    public static void answerTerminalException(HttpRequest request, HttpResponse response, TerminalException e) {
+
+        var status = e.getStatus();
+
+        fillResponseWithStatus(response, status);
+
+        var error = createErrorResponse(request, status);
+        error.setMessage(e.getMessage());
+
+        writeError(response, error);
+    }
+
     public static void answerMethodNotAllowed(HttpRequest request, HttpResponse response, MethodNotAllowedException e) {
 
         var status = HttpStatus.METHOD_NOT_ALLOWED;
@@ -42,8 +55,7 @@ public class ResponseService {
         writeError(response, error);
     }
 
-    public static void answerBadRequest(HttpRequest request, HttpResponse response,
-            UnsupportedMediaTypeStatusException e) {
+    public static void answerBadRequest(HttpRequest request, HttpResponse response, UnsupportedMediaTypeStatusException e) {
 
         var status = HttpStatus.BAD_REQUEST;
 
