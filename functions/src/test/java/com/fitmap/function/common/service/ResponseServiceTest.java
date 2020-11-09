@@ -111,10 +111,10 @@ class ResponseServiceTest {
     }
 
     @Test
-    @DisplayName(value = "should answer bad request for the given UnsupportedMediaTypeStatusException")
-    void should_answer_bad_request_for_the_given_UnsupportedMediaTypeStatusException() throws Exception {
+    @DisplayName(value = "should answer unsupported media type for the given UnsupportedMediaTypeStatusException")
+    void should_answer_unsupported_media_type_for_the_given_UnsupportedMediaTypeStatusException() throws Exception {
 
-        ResponseService.answerBadRequest(request, response, new UnsupportedMediaTypeStatusException(MediaType.APPLICATION_PDF, Arrays.asList(MediaType.APPLICATION_JSON)));
+        ResponseService.answerUnsupportedMediaType(request, response, new UnsupportedMediaTypeStatusException(MediaType.APPLICATION_PDF, Arrays.asList(MediaType.APPLICATION_JSON)));
 
         writerOut.flush();
 
@@ -122,7 +122,7 @@ class ResponseServiceTest {
 
         assertThat(actual)
             .extracting("status", "statusError", "message", "path")
-            .containsExactly(400, "Bad Request", "415 UNSUPPORTED_MEDIA_TYPE \"Content type 'application/pdf' not supported\". Allowed Content-Type are [application/json]", "/test");
+            .containsExactly(415, "Unsupported Media Type", "415 UNSUPPORTED_MEDIA_TYPE \"Content type 'application/pdf' not supported\". Allowed Content-Type are [application/json]", "/test");
 
         assertThat(actual).extracting("timestamp").isNotNull();
     }

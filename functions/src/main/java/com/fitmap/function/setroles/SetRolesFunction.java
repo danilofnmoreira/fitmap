@@ -54,7 +54,7 @@ public class SetRolesFunction implements HttpFunction {
 
         } catch (TerminalException e) { ResponseService.answerTerminalException(request, response, e); }
           catch (MethodNotAllowedException e) { ResponseService.answerMethodNotAllowed(request, response, e); }
-          catch (UnsupportedMediaTypeStatusException e) { ResponseService.answerBadRequest(request, response, e); }
+          catch (UnsupportedMediaTypeStatusException e) { ResponseService.answerUnsupportedMediaType(request, response, e); }
           catch (HttpMessageNotReadableException e) { ResponseService.answerBadRequest(request, response, e); }
           catch (ConstraintViolationException e) { ResponseService.answerBadRequest(request, response, e); }
           catch (Exception e) { ResponseService.answerInternalServerError(request, response, e); }

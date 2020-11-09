@@ -55,9 +55,9 @@ public class ResponseService {
         writeError(response, error);
     }
 
-    public static void answerBadRequest(HttpRequest request, HttpResponse response, UnsupportedMediaTypeStatusException e) {
+    public static void answerUnsupportedMediaType(HttpRequest request, HttpResponse response, UnsupportedMediaTypeStatusException e) {
 
-        var status = HttpStatus.BAD_REQUEST;
+        var status = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
         fillResponseWithStatus(response, status);
 
