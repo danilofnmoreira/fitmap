@@ -2,6 +2,7 @@ package com.fitmap.function.setroles;
 
 import javax.validation.ConstraintViolationException;
 
+import com.fitmap.function.common.config.CloudServicesConfig;
 import com.fitmap.function.common.config.SystemTimeZoneConfig;
 import com.fitmap.function.common.exception.TerminalException;
 import com.fitmap.function.common.service.CheckConstraintsRequestBodyService;
@@ -19,11 +20,21 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class SetRolesFunction implements HttpFunction {
 
     static {
 
         SystemTimeZoneConfig.setUtcDefaultTimeZone();
+    }
+
+    private final SetRolesService setRolesService;
+
+    public SetRolesFunction() {
+
+        this.setRolesService = new SetRolesService(CloudServicesConfig.FIREBASE_AUTH);
     }
 
     @Override
@@ -39,7 +50,7 @@ public class SetRolesFunction implements HttpFunction {
 
             CheckConstraintsRequestBodyService.checkConstraints(body);
 
-            SetRolesService.setRoles(body);
+            setRolesService.setRoles(body);
 
         } catch (TerminalException e) { ResponseService.answerTerminalException(request, response, e); }
           catch (MethodNotAllowedException e) { ResponseService.answerMethodNotAllowed(request, response, e); }

@@ -5,28 +5,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import com.fitmap.function.common.config.CloudServicesConfig;
+import com.fitmap.function.common.exception.TokenExpiredException;
 import com.fitmap.function.setroles.exception.RolesAlreadySettedException;
 import com.fitmap.function.setroles.payload.request.SetRolesRequest;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class SetRolesService {
 
     private static final String ROLES_KEY = "roles";
-    private static final FirebaseAuth FIREBASE_AUTH = CloudServicesConfig.FIREBASE_AUTH;
 
-    @SneakyThrows
-    public static void setRoles(SetRolesRequest request) {
+    private final FirebaseAuth firebaseAuth;
+
+    public void setRoles(SetRolesRequest request) {
 
         var firebaseToken = verifyIdToken(request.getIdToken());
 
@@ -39,7 +37,7 @@ public class SetRolesService {
 
     }
 
-    private static void checkRolesAlreadySetted(FirebaseToken firebaseToken) {
+    private void checkRolesAlreadySetted(FirebaseToken firebaseToken) {
 
         var claims = firebaseToken.getClaims();
 
@@ -50,22 +48,29 @@ public class SetRolesService {
             return;
         }
 
-        throw new RolesAlreadySettedException(String.format("User, %s, already has roles.", firebaseToken.getEmail()));
+        throw new RolesAlreadySettedException();
     }
 
-    private static void setRoles(String uid, String userType) throws FirebaseAuthException {
+    @SneakyThrows
+    private void setRoles(String uid, String userType) {
 
         var rolesValues = List.of("ROLE_" + userType, "ROLE_USER");
 
         var claims = new HashMap<String, Object>();
         claims.put(ROLES_KEY, rolesValues);
 
-        FIREBASE_AUTH.setCustomUserClaims(uid, claims);
+        firebaseAuth.setCustomUserClaims(uid, claims);
     }
 
-    private static FirebaseToken verifyIdToken(String idToken) throws FirebaseAuthException {
+    private FirebaseToken verifyIdToken(String idToken) {
 
-        return FIREBASE_AUTH.verifyIdToken(idToken);
+        try {
+
+            return firebaseAuth.verifyIdToken(idToken);
+        } catch (Exception e) {
+
+            throw new TokenExpiredException();
+        }
     }
 
 }

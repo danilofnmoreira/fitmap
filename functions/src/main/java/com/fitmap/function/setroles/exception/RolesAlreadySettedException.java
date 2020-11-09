@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 @SuppressWarnings("serial")
 public class RolesAlreadySettedException extends TerminalException {
 
-    public RolesAlreadySettedException(String message) {
-        super(message, HttpStatus.CONFLICT);
+    public RolesAlreadySettedException() {
+        super("User already has roles.", HttpStatus.CONFLICT);
     }
 
 }
